@@ -4,7 +4,7 @@ window.INVITE_CONFIG = {
   brideName: "Dilnozaxon",
   groomName: "Xasanjon",
 
-  mainDate: "2026-10-25T15:00:00+05:00",
+  mainDate: "2026-10-25",
 
   // Musiqa fayli GitHub loyihasida bo‘lishi kerak
   musicUrl: "music1.mp3",
