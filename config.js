@@ -1,10 +1,16 @@
+
 /* Taklifnoma ma'lumotlari */
 window.INVITE_CONFIG = {
   brideName: "Dilnozaxon",
   groomName: "Xasanjon",
+
   mainDate: "2026-10-25T15:00:00+05:00",
-  musicUrl: "",
+
+  // Musiqa fayli GitHub loyihasida bo‘lishi kerak
+  musicUrl: "music1.mp3",
+
   endpointUrl: "https://script.google.com/macros/s/AKfycbxKj5fFaHnO2_bLqkT1jSlMxw0RzHMvrKjlWSyDLklBXCAHPg7H2_kSmY0f1URTcFpP/exec",
+
   events: [
     {
       id: "women",
