@@ -1,5 +1,293 @@
-<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fotiha — Admin</title><link rel="stylesheet" href="style.css"><style>body{min-height:100vh}.admin-wrap{max-width:1000px;margin:50px auto;padding:0 18px}.admin-box{background:#fffdf9;border:1px solid var(--line);padding:24px;box-shadow:var(--shadow);margin-bottom:18px}.admin-box h1,.admin-box h2{font-family:'Cormorant Garamond',serif;font-weight:500}.admin-box input{width:100%;max-width:440px;padding:12px;border:1px solid var(--line);margin:6px 0 12px}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px}.stat{padding:15px;background:#f7f0e4;border:1px solid var(--line)}.stat strong{display:block;font:30px 'Cormorant Garamond',serif;color:var(--gold)}.stat span{font-size:11px;color:var(--muted)}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:12px}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);white-space:nowrap}th{color:#99743b;background:#f7f0e4}.admin-error{color:var(--danger);font-size:12px}@media(max-width:600px){.admin-box{padding:15px}}</style></head><body><main class="admin-wrap"><section class="admin-box"><p class="eyebrow">PRIVATE ADMIN</p><h1>Fotiha boshqaruv paneli</h1><p class="field-help">Bu sahifa faqat tashkilotchi uchun. Parol Google Apps Script Script Properties orqali sozlanadi.</p><label class="field-label" for="password">Admin paroli</label><input id="password" type="password" autocomplete="current-password"><br><button id="login" class="gold-button">Kirish ↗</button><p id="error" class="admin-error" role="alert"></p></section><section id="dashboard" class="hidden"><div class="admin-box"><h2>Joriy statistika</h2><div id="stats" class="stats"></div></div><div class="admin-box"><h2>Mehmonlarning eng so‘nggi javoblari</h2><div class="table-wrap"><table><thead><tr><th>Oila</th><th>Ism-familiya</th><th>Tomon</th><th>Jinsi</th><th>Javob</th><th>Yangilangan</th><th>Versiya</th></tr></thead><tbody id="guests"></tbody></table></div></div><div class="admin-box"><h2>Yuborishlar tarixi (qayta kirishlar ham)</h2><div class="table-wrap"><table><thead><tr><th>Vaqt</th><th>Oila</th><th>Tomon</th><th>Keladi</th><th>Kelmaydi</th><th>Versiya</th></tr></thead><tbody id="history"></tbody></table></div><p class="field-help">Yangilangan javoblar “Versiya” raqami orqali ko‘rinadi; barcha yuborishlar tarixda saqlanadi.</p></div></section></main><script>
-const endpoint=(new URLSearchParams(location.search)).get('endpoint')||'';let token='';const $=s=>document.querySelector(s);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const when=s=>{try{return new Date(s).toLocaleString()}catch(e){return s}};
-$('#login').addEventListener('click',async()=>{const error=$('#error');error.textContent='';if(!endpoint){error.textContent='Admin URL sozlanmagan. URL oxiriga ?endpoint=GOOGLE_APPS_SCRIPT_URL qo‘shing.';return;}$('#login').disabled=true;try{const r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'adminLogin',password:$('#password').value})});const d=await r.json();if(!d.ok)throw Error(d.message||'Kirish amalga oshmadi');token=d.token;$('#dashboard').classList.remove('hidden');render(d.summary);$('#password').value='';}catch(e){error.textContent=e.message||'Serverga ulanib bo‘lmadi.'}finally{$('#login').disabled=false}});
-function render(d){const labels={totalRecords:'Jami kishilar (javob bergan)',attending:'Keladiganlar',notAttending:'Kelmaydiganlar',women:'Ayollar — keladi',men:'Erkaklar — keladi',bride:'Kelin tomoni — keladi',groom:'Kuyov tomoni — keladi',households:'Javob bergan oilalar'};$('#stats').innerHTML=Object.entries(labels).map(([k,v])=>`<div class="stat"><strong>${esc(d.stats[k]||0)}</strong><span>${v}</span></div>`).join('');$('#guests').innerHTML=d.guests.map(g=>`<tr><td>${esc(g.familyName)}</td><td>${esc(g.name)}</td><td>${esc(g.side==='bride'?'Kelin':'Kuyov')}</td><td>${esc(g.gender==='female'?'Ayol':'Erkak')}</td><td>${esc(g.attendance==='yes'?'Keladi':'Kelmaydi')}</td><td>${esc(when(g.updatedAt))}</td><td>${esc(g.revision)}</td></tr>`).join('');$('#history').innerHTML=d.history.map(h=>`<tr><td>${esc(when(h.timestamp))}</td><td>${esc(h.familyName)}</td><td>${esc(h.side==='bride'?'Kelin':'Kuyov')}</td><td>${esc(h.attendingCount)}</td><td>${esc(h.notAttendingCount)}</td><td>${esc(h.revision)}</td></tr>`).join('')}
-</script></body></html>
+
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fotiha — Admin panel</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body { min-height: 100vh; }
+    .admin-wrap { max-width: 1000px; margin: 50px auto; padding: 0 18px; }
+    .admin-box {
+      background: #fffdf9;
+      border: 1px solid var(--line);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+    .admin-box h1, .admin-box h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 500;
+    }
+    .admin-box input {
+      width: 100%;
+      max-width: 440px;
+      box-sizing: border-box;
+      padding: 12px;
+      border: 1px solid var(--line);
+      margin: 6px 0 12px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+      gap: 10px;
+    }
+    .stat { padding: 15px; background: #f7f0e4; border: 1px solid var(--line); }
+    .stat strong {
+      display: block;
+      font: 30px 'Cormorant Garamond', serif;
+      color: var(--gold);
+    }
+    .stat span { font-size: 11px; color: var(--muted); }
+    .table-wrap { overflow: auto; }
+    table { border-collapse: collapse; width: 100%; font-size: 12px; }
+    th, td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    th { color: #99743b; background: #f7f0e4; }
+    .admin-error { color: var(--danger); font-size: 12px; }
+    .hidden { display: none !important; }
+    .admin-status { font-size: 13px; margin-top: 10px; }
+    @media (max-width: 600px) {
+      .admin-box { padding: 15px; }
+      .admin-wrap { margin-top: 25px; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="admin-wrap">
+    <section class="admin-box">
+      <p class="eyebrow">PRIVATE ADMIN</p>
+      <h1>Fotiha boshqaruv paneli</h1>
+      <p class="field-help">
+        Bu sahifa tashkilotchi uchun. Admin paroli Google Apps Script
+        sozlamalarida saqlanadi.
+      </p>
+
+      <label class="field-label" for="password">Admin paroli</label>
+      <input id="password" type="password" autocomplete="current-password"
+             placeholder="Admin parolini kiriting">
+
+      <br>
+      <button id="login" class="gold-button" type="button">Kirish ↗</button>
+      <p id="error" class="admin-error" role="alert"></p>
+      <p id="status" class="admin-status" aria-live="polite"></p>
+    </section>
+
+    <section id="dashboard" class="hidden">
+      <div class="admin-box">
+        <h2>Joriy statistika</h2>
+        <div id="stats" class="stats"></div>
+      </div>
+
+      <div class="admin-box">
+        <h2>Mehmonlarning eng so‘nggi javoblari</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Oila</th>
+                <th>Ism-familiya</th>
+                <th>Tomon</th>
+                <th>Jinsi</th>
+                <th>Javob</th>
+                <th>Yangilangan</th>
+                <th>Versiya</th>
+              </tr>
+            </thead>
+            <tbody id="guests"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="admin-box">
+        <h2>Yuborishlar tarixi</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Vaqt</th>
+                <th>Oila</th>
+                <th>Tomon</th>
+                <th>Keladi</th>
+                <th>Kelmaydi</th>
+                <th>Versiya</th>
+              </tr>
+            </thead>
+            <tbody id="history"></tbody>
+          </table>
+        </div>
+        <p class="field-help">
+          Qayta yuborilgan javoblar ham tarixda ko‘rsatiladi,
+          agar Apps Script ularni saqlayotgan bo‘lsa.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Apps Script manzilini config.js dan ham olish -->
+  <script src="config.js"></script>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+
+    const endpoint =
+      params.get('endpoint') ||
+      (window.INVITE_CONFIG && window.INVITE_CONFIG.endpointUrl) ||
+      '';
+
+    let token = '';
+
+    const $ = selector => document.querySelector(selector);
+
+    const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[char]);
+
+    const when = value => {
+      if (!value) return '—';
+      const date = new Date(value);
+      return Number.isNaN(date.getTime())
+        ? String(value)
+        : date.toLocaleString('uz-UZ');
+    };
+
+    function showError(message) {
+      $('#error').textContent = message;
+    }
+
+    $('#login').addEventListener('click', async () => {
+      showError('');
+      $('#status').textContent = '';
+
+      if (!endpoint) {
+        showError(
+          'Google Apps Script manzili topilmadi. config.js ichidagi endpointUrl ni tekshiring.'
+        );
+        return;
+      }
+
+      const password = $('#password').value;
+
+      if (!password) {
+        showError('Admin parolini kiriting.');
+        return;
+      }
+
+      $('#login').disabled = true;
+      $('#status').textContent = 'Tekshirilmoqda…';
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify({
+            action: 'adminLogin',
+            password: password
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Server javobida xatolik: ' + response.status);
+        }
+
+        const data = await response.json();
+
+        if (!data.ok) {
+          throw new Error(data.message || 'Parol noto‘g‘ri yoki kirish rad etildi.');
+        }
+
+        if (!data.summary || !data.summary.stats) {
+          throw new Error('Server statistikani qaytarmadi. Apps Script kodini tekshiring.');
+        }
+
+        token = data.token || '';
+        render(data.summary);
+
+        $('#dashboard').classList.remove('hidden');
+        $('#password').value = '';
+        $('#status').textContent = 'Admin panel ochildi.';
+      } catch (error) {
+        showError(
+          error.message ||
+          'Serverga ulanib bo‘lmadi. Internet yoki Apps Script sozlamalarini tekshiring.'
+        );
+        $('#status').textContent = '';
+      } finally {
+        $('#login').disabled = false;
+      }
+    });
+
+    $('#password').addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        $('#login').click();
+      }
+    });
+
+    function render(data) {
+      const stats = data.stats || {};
+
+      const labels = {
+        totalRecords: 'Javob bergan mehmonlar',
+        attending: 'Keladiganlar',
+        notAttending: 'Kelmaydiganlar',
+        women: 'Ayollar — keladi',
+        men: 'Erkaklar — keladi',
+        bride: 'Kelin tomoni — keladi',
+        groom: 'Kuyov tomoni — keladi',
+        households: 'Javob bergan oilalar'
+      };
+
+      $('#stats').innerHTML = Object.entries(labels)
+        .map(([key, label]) => `
+          <div class="stat">
+            <strong>${esc(stats[key] ?? 0)}</strong>
+            <span>${esc(label)}</span>
+          </div>
+        `).join('');
+
+      const guests = Array.isArray(data.guests) ? data.guests : [];
+      const history = Array.isArray(data.history) ? data.history : [];
+
+      $('#guests').innerHTML = guests.map(guest => `
+        <tr>
+          <td>${esc(guest.familyName)}</td>
+          <td>${esc(guest.name)}</td>
+          <td>${esc(guest.side === 'bride' ? 'Kelin' :
+                     guest.side === 'groom' ? 'Kuyov' : '—')}</td>
+          <td>${esc(guest.gender === 'female' ? 'Ayol' :
+                     guest.gender === 'male' ? 'Erkak' : '—')}</td>
+          <td>${esc(guest.attendance === 'yes' ? 'Keladi' :
+                     guest.attendance === 'no' ? 'Kelmaydi' : '—')}</td>
+          <td>${esc(when(guest.updatedAt))}</td>
+          <td>${esc(guest.revision ?? '—')}</td>
+        </tr>
+      `).join('');
+
+      $('#history').innerHTML = history.map(item => `
+        <tr>
+          <td>${esc(when(item.timestamp))}</td>
+          <td>${esc(item.familyName)}</td>
+          <td>${esc(item.side === 'bride' ? 'Kelin' :
+                     item.side === 'groom' ? 'Kuyov' : '—')}</td>
+          <td>${esc(item.attendingCount ?? 0)}</td>
+          <td>${esc(item.notAttendingCount ?? 0)}</td>
+          <td>${esc(item.revision ?? '—')}</td>
+        </tr>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
