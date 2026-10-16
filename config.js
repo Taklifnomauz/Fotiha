@@ -13,7 +13,7 @@ window.INVITE_CONFIG = {
       id: "women",
       side: "both",
       audience: "women",
-      date: "2026-10-25 T13:00:00+05:00",
+      date: "2026-10-25T13:00:00+05:00",
       venue: "Ayollar marosimi",
       address: "Kelin tomoni: manzilni kiriting; Kuyov tomoni: manzilni kiriting",
       mapsUrl: ""
