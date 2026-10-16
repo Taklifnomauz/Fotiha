@@ -139,12 +139,12 @@ main {
   border-radius: 0 0 6px 6px;
 }
 
-/* Xat va uning ichidagi X, D va Fotiha taklifnomasi yozuvi */
+/* Xat va uning ichidagi FOTIHA TAKLIFNOMASI hamda X, D harflari */
 .envelope-letter {
   position: absolute;
-  left: 22px;
-  right: 22px;
-  top: -29px;
+  left: 18px;
+  right: 18px;
+  top: -16px;
   height: 110px;
   background: var(--paper);
   border: 1px solid var(--gold2);
@@ -152,32 +152,32 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 8px 12px;
-  gap: 4px;
+  justify-content: flex-start;
+  padding: 10px 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.06);
 }
 
-.letter-top-row {
+.letter-top-title {
+  font: 700 11px "Cormorant Garamond", Georgia, serif;
+  letter-spacing: 1.5px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.letter-middle-row {
   width: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0 6px;
+  justify-content: space-between;
+  padding: 0 8px;
 }
 
 .letter-initial {
-  font: 700 22px "Cormorant Garamond", Georgia, serif;
+  font: 700 28px "Cormorant Garamond", Georgia, serif;
   color: var(--gold);
-}
-
-.letter-caption {
-  font-size: 8px;
-  letter-spacing: 1px;
-  color: var(--gold);
-  text-transform: uppercase;
-  font-weight: 700;
-  margin-top: 2px;
+  z-index: 5;
 }
 
 .envelope-flap {
@@ -197,9 +197,9 @@ main {
 /* Sham eritib muhrlangan dumaloq Wax Seal (Al-Qamir ramzi bilan) */
 .wax-seal {
   position: absolute;
-  z-index: 4;
+  z-index: 6;
   left: calc(50% - 22px);
-  top: 38px;
+  top: 48px;
   width: 44px;
   height: 44px;
   background: radial-gradient(circle at 35% 35%, #d62832 0%, #a81c24 60%, #6e0b10 100%);
