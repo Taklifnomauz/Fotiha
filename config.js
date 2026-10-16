@@ -1,12 +1,12 @@
-
 /* Taklifnoma ma'lumotlari */
 window.INVITE_CONFIG = {
   brideName: "Dilnozaxon",
   groomName: "Xasanjon",
 
-  mainDate: "2026-10-25",
+  // Vaqt chiqmasligi uchun to'g'ridan-to'g'ri matn ko'rinishida yozamiz:
+  mainDate: "25-oktabr 2026-yil",
 
-  // Musiqa fayli GitHub loyihasida bo‘lishi kerak
+  // Musiqa fayli loyihada bo'lishi kerak
   musicUrl: "music1.mp3",
 
   endpointUrl: "https://script.google.com/macros/s/AKfycbxKj5fFaHnO2_bLqkT1jSlMxw0RzHMvrKjlWSyDLklBXCAHPg7H2_kSmY0f1URTcFpP/exec",
