@@ -10,39 +10,21 @@ window.INVITE_CONFIG = {
 
   events: [
     {
-      id: "bride-women",
-      side: "bride",
+      id: "women",
+      side: "both",
       audience: "women",
       date: "2026-12-20T15:00:00+05:00",
-      venue: "Kelin tomoni — ayollar marosimi",
-      address: "Manzilni kiriting",
+      venue: "Ayollar marosimi",
+      address: "Kelin tomoni: manzilni kiriting; Kuyov tomoni: manzilni kiriting",
       mapsUrl: ""
     },
     {
-      id: "groom-women",
-      side: "groom",
-      audience: "women",
-      date: "2026-12-21T15:00:00+05:00",
-      venue: "Kuyov tomoni — ayollar marosimi",
-      address: "Manzilni kiriting",
-      mapsUrl: ""
-    },
-    {
-      id: "bride-men",
-      side: "bride",
+      id: "men",
+      side: "both",
       audience: "men",
       date: "2026-12-20T18:00:00+05:00",
-      venue: "Kelin tomoni — erkaklar marosimi",
-      address: "Manzilni kiriting",
-      mapsUrl: ""
-    },
-    {
-      id: "groom-men",
-      side: "groom",
-      audience: "men",
-      date: "2026-12-21T18:00:00+05:00",
-      venue: "Kuyov tomoni — erkaklar marosimi",
-      address: "Manzilni kiriting",
+      venue: "Erkaklar marosimi",
+      address: "Kelin tomoni: manzilni kiriting; Kuyov tomoni: manzilni kiriting",
       mapsUrl: ""
     }
   ]
