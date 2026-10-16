@@ -3,7 +3,7 @@ window.INVITE_CONFIG = {
   brideName: "Dilnozaxon",
   groomName: "Xasanjon",
 
-  mainDate: "2026-10-25 T15:00:00+05:00",
+  mainDate: "2026-10-25T15:00:00+05:00",
   musicUrl: "",
 
   endpointUrl: "https://script.google.com/macros/s/AKfycbxKj5fFaHnO2_bLqkT1jSlMxw0RzHMvrKjlWSyDLklBXCAHPg7H2_kSmY0f1URTcFpP/exec",
@@ -19,8 +19,8 @@ window.INVITE_CONFIG = {
       mapsUrl: ""
     },
     {
+      id: "men",
       side: "bride",
-      audience: "men",
       audience: "men",
       date: "2026-10-25T11:00:00+05:00",
       venue: "Erkaklar marosimi",
