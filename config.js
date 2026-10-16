@@ -11,7 +11,7 @@ window.INVITE_CONFIG = {
   events: [
     {
       id: "women",
-      side: "both",
+      side: "bride",
       audience: "women",
       date: "2026-10-25T13:00:00+05:00",
       venue: "Ayollar marosimi",
@@ -19,8 +19,8 @@ window.INVITE_CONFIG = {
       mapsUrl: ""
     },
     {
-      id: "men",
-      side: "both",
+      side: "bride",
+      audience: "men",
       audience: "men",
       date: "2026-10-25T11:00:00+05:00",
       venue: "Erkaklar marosimi",
