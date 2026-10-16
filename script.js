@@ -16,7 +16,23 @@
     }
   };
   const t = key => (translations[state.lang] || translations.uz)[key] || translations.uz[key] || key;
-  const dateFmt = d => { const date = new Date(d); if (Number.isNaN(date.getTime())) return String(d || ''); return new Intl.DateTimeFormat(state.lang==='uz'?'uz-UZ':state.lang==='ru'?'ru-RU':'en-GB',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(date); };
+  const dateFmt = d => {
+    const date = new Date(d);
+    if (Number.isNaN(date.getTime())) return String(d || '');
+    const timePart = new Intl.DateTimeFormat(state.lang === 'ru' ? 'ru-RU' : 'en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'Asia/Tashkent' }).format(date);
+    if (state.lang === 'uz') {
+      const parts = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric', timeZone: 'Asia/Tashkent' }).formatToParts(date);
+      const get = type => parts.find(part => part.type === type)?.value || '';
+      const months = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'];
+      const day = get('day');
+      const month = months[Number(get('month')) - 1] || get('month');
+      const year = get('year');
+      return `${day}-${month} ${year}, ${timePart}`;
+    }
+    const locale = state.lang === 'ru' ? 'ru-RU' : 'en-GB';
+    const datePart = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Tashkent' }).format(date);
+    return `${datePart}, ${timePart}`;
+  };
   const safeText = v => String(v ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   function applyLanguage(lang) {
     state.lang = translations[lang] ? lang : 'uz'; localStorage.setItem('fotiha_lang',state.lang); document.documentElement.lang=state.lang;
@@ -26,14 +42,58 @@
     $('#musicToggle span').textContent = state.musicStarted ? t('musicOff') : t('musicOn');
     renderEvents(); renderCountdowns(); renderGuestList();
   }
+  function eventLabel(e) { return `${t(e.audience === 'women' ? 'women' : 'men')} ${state.lang === 'uz' ? 'marosimi' : state.lang === 'ru' ? 'мероприятие' : 'event'}`; }
   function renderEvents() {
-    const events=cfg.events||[];
-    $('#eventCards').innerHTML=events.map(e=>`<article class="event-card"><span class="event-tag">${safeText(t(e.side==='bride'?'bride':'groom'))} · ${safeText(t(e.audience==='women'?'women':'men'))}</span><h3>${safeText(e.venue||t('scheduleTitle'))}</h3><div class="event-date">${safeText(dateFmt(e.date))}</div><p class="event-address">${safeText(t('address'))}: ${safeText(e.address||'')}</p>${e.mapsUrl?`<a class="map-link" href="${safeText(e.mapsUrl)}" target="_blank" rel="noopener noreferrer">${safeText(t('map'))} ↗</a>`:''}</article>`).join('');
+    const events = Array.isArray(cfg.events) ? cfg.events : [];
+    const groups = [
+      { audience: 'women', items: events.filter(e => e.audience === 'women') },
+      { audience: 'men', items: events.filter(e => e.audience === 'men') }
+    ].filter(g => g.items.length);
+    $('#eventCards').innerHTML = groups.map(g => `<article class="event-card"><span class="event-tag">${safeText(t(g.audience))}</span><h3>${safeText(t(g.audience))} ${safeText(state.lang === 'uz' ? 'marosimi' : state.lang === 'ru' ? 'мероприятие' : 'event')}</h3>${g.items.slice().sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(e => `<div class="event-subitem"><div class="event-venue">${safeText(e.venue || '')}</div><div class="event-date">${safeText(dateFmt(e.date))}</div><p class="event-address">${safeText(t('address'))}: ${safeText(e.address || '')}</p>${e.mapsUrl ? `<a class="map-link" href="${safeText(e.mapsUrl)}" target="_blank" rel="noopener noreferrer">${safeText(t('map'))} ↗</a>` : ''}</div>`).join('')}</article>`).join('');
+  }
+  function nextEventForAudience(audience, now = Date.now()) {
+    const list = (Array.isArray(cfg.events) ? cfg.events : [])
+      .filter(e => e.audience === audience && Number.isFinite(new Date(e.date).getTime()))
+      .sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    return list.find(e => new Date(e.date).getTime() > now) || list[list.length - 1] || null;
   }
   function renderCountdowns() {
-    $('#countdowns').innerHTML=(cfg.events||[]).map(e=>`<article class="countdown-card" data-countdown="${safeText(e.id)}"><h3>${safeText(t(e.side==='bride'?'bride':'groom'))} · ${safeText(t(e.audience==='women'?'women':'men'))}</h3><div class="time-grid"><div class="time-unit"><strong data-part="d">--</strong><span>${t('day')}</span></div><div class="time-unit"><strong data-part="h">--</strong><span>${t('hour')}</span></div><div class="time-unit"><strong data-part="m">--</strong><span>${t('minute')}</span></div><div class="time-unit"><strong data-part="s">--</strong><span>${t('second')}</span></div></div></article>`).join(''); tickCountdowns();
+    const groups = [{audience:'women',label:'women'},{audience:'men',label:'men'}]
+      .filter(g => (Array.isArray(cfg.events) ? cfg.events : []).some(e => e.audience === g.audience));
+    $('#countdowns').innerHTML = groups.map(g => `<article class="countdown-card" data-countdown="${g.audience}"><h3>${safeText(t(g.label))} ${safeText(state.lang === 'uz' ? 'marosimigacha' : state.lang === 'ru' ? 'до мероприятия' : 'until the event')}</h3><p class="countdown-status"></p><div class="time-grid"><div class="time-unit"><strong data-part="d">--</strong><span>${t('day')}</span></div><div class="time-unit"><strong data-part="h">--</strong><span>${t('hour')}</span></div><div class="time-unit"><strong data-part="m">--</strong><span>${t('minute')}</span></div><div class="time-unit"><strong data-part="s">--</strong><span>${t('second')}</span></div></div></article>`).join('');
+    tickCountdowns();
   }
-  function tickCountdowns(){const now=Date.now();$$('[data-countdown]').forEach(card=>{const e=(cfg.events||[]).find(x=>x.id===card.dataset.countdown);if(!e)return;const delta=new Date(e.date).getTime()-now;if(!Number.isFinite(delta))return;if(delta<=0){card.innerHTML=`<h3>${safeText(t(e.side==='bride'?'bride':'groom'))} · ${safeText(t(e.audience==='women'?'women':'men'))}</h3><p class="time-ended">${safeText(now-new Date(e.date).getTime()<86400000?t('started'):t('ended'))}</p>`;return;}const total=Math.floor(delta/1000),vals={d:Math.floor(total/86400),h:Math.floor(total%86400/3600),m:Math.floor(total%3600/60),s:total%60};Object.entries(vals).forEach(([k,v])=>{const el=$(`[data-part="${k}"]`,card);if(el)el.textContent=k==='d'?String(v):String(v).padStart(2,'0')})})}
+  function tickCountdowns() {
+    const now = Date.now();
+    $$('[data-countdown]').forEach(card => {
+      const e = nextEventForAudience(card.dataset.countdown, now);
+      const status = $('.countdown-status', card);
+      const grid = $('.time-grid', card);
+      if (!e) {
+        if (status) status.textContent = state.lang === 'uz' ? 'Sana sozlanmagan' : state.lang === 'ru' ? 'Дата не указана' : 'Date not configured';
+        return;
+      }
+      if (status) status.textContent = `${eventLabel(e)} · ${dateFmt(e.date)}`;
+      const delta = new Date(e.date).getTime() - now;
+      if (!Number.isFinite(delta)) {
+        if (status) status.textContent = state.lang === 'uz' ? 'Sana formatini tekshiring' : state.lang === 'ru' ? 'Проверьте формат даты' : 'Check date format';
+        return;
+      }
+      if (delta <= 0) {
+        if (grid) grid.innerHTML = `<p class="time-ended">${safeText(t(now - new Date(e.date).getTime() < 86400000 ? 'started' : 'ended'))}</p>`;
+        return;
+      }
+      if (grid && !grid.querySelector('[data-part="d"]')) {
+        grid.innerHTML = `<div class="time-unit"><strong data-part="d">--</strong><span>${t('day')}</span></div><div class="time-unit"><strong data-part="h">--</strong><span>${t('hour')}</span></div><div class="time-unit"><strong data-part="m">--</strong><span>${t('minute')}</span></div><div class="time-unit"><strong data-part="s">--</strong><span>${t('second')}</span></div>`;
+      }
+      const total = Math.floor(delta / 1000);
+      const vals = {d: Math.floor(total / 86400), h: Math.floor(total % 86400 / 3600), m: Math.floor(total % 3600 / 60), s: total % 60};
+      Object.entries(vals).forEach(([k,v]) => {
+        const el = $(`[data-part="${k}"]`, card);
+        if (el) el.textContent = k === 'd' ? String(v) : String(v).padStart(2, '0');
+      });
+    });
+  }
   function addGuest(data={}) { const index=++state.guestCount; const card=document.createElement('article');card.className='guest-card';card.dataset.guest='';card.innerHTML=`<div class="guest-card-head"><strong>${safeText(t('guest'))} ${$$('[data-guest]').length+1}</strong><button type="button" class="remove-guest">${safeText(t('remove'))} ×</button></div><div class="guest-fields"><div class="full"><label>${safeText(t('fullName'))}</label><input class="guest-name" maxlength="100" autocomplete="name" placeholder="${safeText(t('namePlaceholder'))}" value="${safeText(data.name||'')}" required></div><div><label>${safeText(t('gender'))}</label><select class="guest-gender" required><option value="">${safeText(t('chooseGender'))}</option><option value="female" ${data.gender==='female'?'selected':''}>${safeText(t('female'))}</option><option value="male" ${data.gender==='male'?'selected':''}>${safeText(t('male'))}</option></select></div><div><label>${safeText(t('attendance'))}</label><div class="attendance-options"><label><input type="radio" name="att-${index}" value="yes" ${data.attendance==='yes'?'checked':''}> ${safeText(t('yes'))}</label><label><input type="radio" name="att-${index}" value="no" ${data.attendance==='no'?'checked':''}> ${safeText(t('no'))}</label></div></div></div>`;
     $('.remove-guest',card).addEventListener('click',()=>{if($$('[data-guest]').length>1){card.remove();renumberGuests()}else{$('.guest-name',card).value='';$('.guest-gender',card).value='';$$('input[type=radio]',card).forEach(r=>r.checked=false);}});$('#guestList').append(card);renumberGuests();return card; }
   function renumberGuests(){ $$('[data-guest]').forEach((card,i)=>{const h=$('strong',card);if(h)h.textContent=`${t('guest')} ${i+1}`;}); }
