@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f8f2e8"><meta name="description" content="Fotiha marosimiga elektron taklifnoma">
+  <title>Fotiha taklifnomasi</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="petal-layer" aria-hidden="true"></div>
+  <main>
+    <section id="welcome" class="welcome-screen">
+      <div class="language-picker" aria-label="Choose language">
+        <button class="lang active" data-lang="uz">UZ</button><button class="lang" data-lang="ru">RU</button><button class="lang" data-lang="en">ENG</button>
+      </div>
+      <div class="envelope-wrap"><div class="envelope"><div class="envelope-letter"><span class="letter-monogram">♡</span><span class="letter-caption">SPECIAL INVITATION</span></div><div class="envelope-flap"></div><div class="wax-seal">A<span>✦</span></div></div></div>
+      <p class="eyebrow" data-i18n="welcomeEyebrow">SIZNI QUVONCHLI KUNIMIZGA TAKLIF ETAMIZ</p>
+      <h1 class="hero-title" data-i18n="welcomeTitle">Fotiha marosimi</h1>
+      <p class="welcome-sub" data-i18n="welcomeSub">Samimiy taklifnomamizni oching</p>
+      <button id="openInvitation" class="gold-button"><span data-i18n="openInvite">Taklifnomani ochish</span><span aria-hidden="true">↗</span></button>
+      <div class="ornament">✦ ───── ❦ ───── ✦</div>
+    </section>
+
+    <section id="invitation" class="invitation hidden">
+      <header class="topbar"><div class="mini-brand">✦ <span data-i18n="brand">Fotiha taklifnomasi</span></div><div class="top-actions"><div class="language-picker compact"><button class="lang active" data-lang="uz">UZ</button><button class="lang" data-lang="ru">RU</button><button class="lang" data-lang="en">ENG</button></div><button id="musicToggle" class="icon-button" aria-label="Music">♫ <span data-i18n="musicOn">Musiqani yoqish</span></button></div></header>
+      <section class="hero-card panel">
+        <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
+        <p class="eyebrow" data-i18n="inviteEyebrow">BISMILLAHIR ROHMANIR ROHIYM</p>
+        <div class="floral-mark">❦</div><p class="small-line" data-i18n="inviteSub">Sizni hayotimizdagi quvonchli kunlardan biriga</p>
+        <h2 class="names"><span id="brideName">Kelin ismi</span><i>&</i><span id="groomName">Kuyov ismi</span></h2>
+        <p class="invite-title" data-i18n="inviteTitle">Fotiha marosimimizga taklif etamiz</p>
+        <div class="date-line"><span>✦</span><strong id="mainDate">Sana kiritiladi</strong><span>✦</span></div>
+        <p class="quote" data-i18n="quote">Quvonchimizga sherik bo‘lishingiz biz uchun katta baxt.</p>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading"><p class="eyebrow" data-i18n="scheduleEyebrow">MAROSIM MA’LUMOTLARI</p><h2 data-i18n="scheduleTitle">Sizni kutamiz</h2><p data-i18n="scheduleSub">Har bir marosim uchun vaqt va manzil</p></div>
+        <div id="eventCards" class="event-grid"></div>
+      </section>
+
+      <section class="section-block countdown-section">
+        <div class="section-heading"><p class="eyebrow" data-i18n="countEyebrow">HAYAJONLI LAHZALARGACHA</p><h2 data-i18n="countTitle">Uchrashuvgacha qolgan vaqt</h2></div>
+        <div id="countdowns" class="countdown-grid"></div>
+      </section>
+
+      <section class="section-block rsvp-section" id="rsvpSection">
+        <div class="section-heading"><p class="eyebrow" data-i18n="rsvpEyebrow">JAVOBINGIZNI KUTAMIZ</p><h2 data-i18n="rsvpTitle">Ishtirokingizni tasdiqlang</h2><p data-i18n="rsvpSub">Har bir oila a’zosini alohida kiriting.</p></div>
+        <form id="rsvpForm" class="rsvp-form" novalidate>
+          <label class="field-label" for="familyName" data-i18n="familyLabel">Oila / javob beruvchi nomi</label><input id="familyName" name="familyName" autocomplete="name" data-placeholder="familyPlaceholder" placeholder="Masalan: Ali Valiyevlar oilasi" required>
+          <label class="field-label" for="sideSelect" data-i18n="sideLabel">Qaysi tomonga taklif etilgansiz? *</label><select id="sideSelect" required><option value="" data-i18n="sidePlaceholder">Tomonni tanlang</option><option value="bride" data-i18n="brideSide">Kelin tomoni</option><option value="groom" data-i18n="groomSide">Kuyov tomoni</option></select>
+          <div class="guest-head"><div><label class="field-label" data-i18n="membersLabel">Oila a’zolari</label><p class="field-help" data-i18n="membersHelp">Har bir kishining javobi alohida belgilanadi.</p></div><button type="button" id="addGuest" class="outline-button">＋ <span data-i18n="addPerson">Kishi qo‘shish</span></button></div>
+          <div id="guestList" class="guest-list"></div>
+          <p id="formError" class="form-error" role="alert" aria-live="polite"></p>
+          <button type="submit" class="gold-button submit-button"><span data-i18n="sendResponse">Javobni yuborish</span><span>↗</span></button>
+          <p class="privacy-note" data-i18n="privacyNote">Ma’lumotlaringiz faqat marosimni tashkil etish uchun ishlatiladi.</p>
+        </form>
+      </section>
+      <section id="thankYou" class="thank-you panel hidden" aria-live="polite"><div class="thank-icon">✦</div><h2 data-i18n="thanksTitle">Javobingiz uchun rahmat!</h2><p id="thanksMessage" data-i18n="thanksText">Javobingiz muvaffaqiyatli qabul qilindi.</p><button id="editResponse" class="outline-button" data-i18n="editResponse">Javobni o‘zgartirish</button></section>
+      <footer><div class="ornament">✦ ───── ❦ ───── ✦</div><p data-i18n="footerText">Mehr va ezgu tilaklar ila</p><small>Made with love</small></footer>
+    </section>
+  </main>
+  <audio id="bgMusic" loop preload="none"></audio>
+  <script src="config.js"></script><script src="script.js"></script>
+</body></html>
