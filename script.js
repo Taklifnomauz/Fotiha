@@ -24,7 +24,7 @@
       musicOff:'Musiqani o‘chirish',
       inviteEyebrow:'BISMILLAHIR ROHMANIR ROHIYM',
       inviteSub:'Sizni hayotimizdagi quvonchli kunlardan biriga',
-      inviteTitle:'Fotiha marosimimizga taklif etamiz',
+      inviteTitle:'Fotiha marosimiga taklif etamiz',
       quote:'Quvonchimizga sherik bo‘lishingiz biz uchun katta baxt.',
       scheduleEyebrow:'MAROSIM MA’LUMOTLARI',
       scheduleTitle:'Sizni kutamiz',
