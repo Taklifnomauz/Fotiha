@@ -17,8 +17,8 @@ window.INVITE_CONFIG = {
       audience: "women",
       date: "2026-10-25T13:00:00+05:00",
       venue: "Ayollar marosimi",
-      address: "Kelin tomoni: manzilni kiriting; Kuyov tomoni: manzilni kiriting",
-      mapsUrl: ""
+      address: "Toshkent shahri, Uchtepa tumani, Uchtepa prokuraturasi mo‘ljalida",
+      mapsUrl: "https://yandex.uz/maps/-/CXFmqHnD"
     },
     {
       id: "men",
@@ -26,8 +26,8 @@ window.INVITE_CONFIG = {
       audience: "men",
       date: "2026-10-25T11:00:00+05:00",
       venue: "Erkaklar marosimi",
-      address: "Kelin tomoni: manzilni kiriting; Kuyov tomoni: manzilni kiriting",
-      mapsUrl: ""
+      address: "Toshkent shahri, Uchtepa tumani, Uchtepa prokuraturasi mo‘ljalida",
+      mapsUrl: "https://yandex.uz/maps/-/CXFmqHnD"
     }
   ]
 };
