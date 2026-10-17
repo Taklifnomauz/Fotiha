@@ -1,8 +1,7 @@
 /* Taklifnoma ma'lumotlari */
 window.INVITE_CONFIG = {
-  groomName: "Dilnozaxon",
   brideName: "Xasanjon",
-
+  groomName: "Dilnozaxon",
   // Vaqt chiqmasligi uchun to'g'ridan-to'g'ri matn ko'rinishida yozamiz:
   mainDate: "25-oktabr 2026-yil",
 
